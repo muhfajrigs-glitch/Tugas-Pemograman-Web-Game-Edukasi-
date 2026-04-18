@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizNova — Game Edukasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══ AMBIENT BACKGROUND ══ -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ══ TOAST NOTIFICATION ══ -->
+  <div id="toast"></div>
+
+  <!-- ══ MUTE TOGGLE ══ -->
+  <button id="muteBtn" class="mute-btn" title="Toggle Sound">🔊</button>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: MENU
+  ══════════════════════════════════════ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-card">
+      <div class="logo-wrap">
+        <span class="logo-icon">⚡</span>
+        <h1 class="logo-text">QuizNova</h1>
+        <p class="logo-sub">Game Edukasi Interaktif</p>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <span class="stat-val" id="stat-highscore">0</span>
+          <span class="stat-lbl">Best Score</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val" id="stat-streak">0</span>
+          <span class="stat-lbl">Streak 🔥</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val" id="stat-played">0</span>
+          <span class="stat-lbl">Played</span>
+        </div>
+      </div>
+
+      <!-- LEVEL BUTTONS -->
+      <div class="level-grid">
+        <button class="level-btn" data-level="1" onclick="startLevel(1)">
+          <span class="lbtn-icon">🌱</span>
+          <span class="lbtn-label">Level 1</span>
+          <span class="lbtn-sub">Mudah</span>
+          <div class="lbtn-stars" id="stars-1">☆☆☆</div>
+        </button>
+        <button class="level-btn locked" id="level2" data-level="2" onclick="startLevel(2)" disabled>
+          <span class="lbtn-icon">🔥</span>
+          <span class="lbtn-label">Level 2</span>
+          <span class="lbtn-sub">Sedang</span>
+          <div class="lbtn-stars" id="stars-2">☆☆☆</div>
+          <span class="lock-icon">🔒</span>
+        </button>
+        <button class="level-btn locked" id="level3" data-level="3" onclick="startLevel(3)" disabled>
+          <span class="lbtn-icon">💎</span>
+          <span class="lbtn-label">Level 3</span>
+          <span class="lbtn-sub">Sulit</span>
+          <div class="lbtn-stars" id="stars-3">☆☆☆</div>
+          <span class="lock-icon">🔒</span>
+        </button>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="leaderboard-wrap">
+        <h3 class="section-title">🏆 Leaderboard</h3>
+        <ol id="leaderboard-list" class="leaderboard-list">
+          <li class="lb-empty">Belum ada skor. Ayo main!</li>
+        </ol>
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div class="achievements-wrap">
+        <h3 class="section-title">🎖 Achievements</h3>
+        <div id="achievements-row" class="achievements-row"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: GAME
+  ══════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="game-card">
+
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <button class="icon-btn back-btn" onclick="confirmBack()">←</button>
+        <h2 id="levelTitle" class="level-title">Level 1</h2>
+        <div class="combo-badge" id="comboBadge">x0</div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill"></div>
+        <span id="progressLabel" class="progress-label">0/7</span>
+      </div>
+
+      <!-- STATUS -->
+      <div class="status-row">
+        <div class="status-item lives-wrap">
+          <span id="livesDisplay">❤️❤️❤️</span>
+        </div>
+        <div class="timer-ring-wrap">
+          <svg class="timer-ring" viewBox="0 0 44 44">
+            <circle class="timer-bg" cx="22" cy="22" r="18"/>
+            <circle id="timerArc" class="timer-arc" cx="22" cy="22" r="18"/>
+          </svg>
+          <span id="timer" class="timer-num">10</span>
+        </div>
+        <div class="status-item score-wrap">
+          <span class="score-label">Score</span>
+          <span id="score" class="score-val">0</span>
+        </div>
+      </div>
+
+      <!-- QUESTION -->
+      <div class="question-wrap">
+        <p id="question" class="question-text"></p>
+      </div>
+
+      <!-- ANSWERS -->
+      <div id="answers" class="answers-grid"></div>
+
+      <!-- POWERUPS -->
+      <div class="powerups-row">
+        <button class="power-btn" id="pw-5050" onclick="usePowerup('5050')" title="50:50">
+          <span>⚡</span><small>50:50</small>
+        </button>
+        <button class="power-btn" id="pw-time" onclick="usePowerup('time')" title="+5 Detik">
+          <span>⏳</span><small>+5s</small>
+        </button>
+        <button class="power-btn" id="pw-skip" onclick="usePowerup('skip')" title="Skip">
+          <span>⏭</span><small>Skip</small>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: RESULT
+  ══════════════════════════════════════ -->
+  <div id="screen-result" class="screen">
+    <div class="result-card">
+      <div id="result-emoji" class="result-emoji">🎉</div>
+      <h2 id="result-title" class="result-title">Level Selesai!</h2>
+      <div class="result-score-wrap">
+        <span class="result-score-label">Skor Akhir</span>
+        <span id="result-score" class="result-score-val">0</span>
+      </div>
+      <div class="result-stars" id="result-stars">☆☆☆</div>
+      <div class="result-breakdown" id="result-breakdown"></div>
+      <div class="result-btns">
+        <button class="result-btn secondary" onclick="backToMenu()">🏠 Menu</button>
+        <button class="result-btn primary" id="nextLevelBtn" onclick="nextLevel()">Lanjut ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ OVERLAY: CORRECT / WRONG FLASH ══ -->
+  <div id="flashOverlay" class="flash-overlay"></div>
+
+  <!-- ══ FLOATING SCORE POPUP ══ -->
+  <div id="scorePopup" class="score-popup"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
